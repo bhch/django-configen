@@ -29,23 +29,27 @@ final generated config files will have appropriate paths and other variables.
 
 Add `configen` to `INSTALLED_APPS` list:
 
-    INSTALLED_APPS = [
-        # ... 
-        'configen',
-    ]
+```python
+INSTALLED_APPS = [
+    # ... 
+    'configen',
+]
+```
 
 Add these settings to configure configen:
 
-    # where configen will look for config templates
-    CONFIGEN_TEMPLATES_DIR = os.path.join(BASE_DIR, 'configs/templates')
+```python
+# where configen will look for config templates
+CONFIGEN_TEMPLATES_DIR = os.path.join(BASE_DIR, 'configs/templates')
 
-    # where configen will keep the generated files
-    CONFIGEN_OUTPUT_DIR = os.path.join(BASE_DIR, 'configs/output')
+# where configen will keep the generated files
+CONFIGEN_OUTPUT_DIR = os.path.join(BASE_DIR, 'configs/output')
 
-    # config context processors
-    CONFIGEN_CONFIG_PROCESSORS = [
-        'configen.config_processors.common',
-    ]
+# config context processors
+CONFIGEN_CONFIG_PROCESSORS = [
+    'configen.config_processors.common',
+]
+```
 
 
 `CONFIGEN_CONFIG_PROCESSORS` is a list of config processor functions. They are 
@@ -95,23 +99,25 @@ it with the given variables. The generated file will be inside the
 A quick way to provide extra context variables is by using 
 `CONFIGEN_DEFAULT_CONTEXT` setting:
 
-    CONFIGEN_DEFAULT_CONTEXT = {
-        '*': {
-            # variables listed here will be available to 
-            # all templates
-            'project_name': 'example',
-        },
-        'nginx.conf': {
-            # variables listed here will be available only to
-            # nginx.conf template
-            'domain': 'example.com',
-        },
-        'uwsgi.ini': {
-            # variables listed here will be available only to
-            # uwsgi.ini template
-            'module': 'myproject.wisgi',
-        }
+```python
+CONFIGEN_DEFAULT_CONTEXT = {
+    '*': {
+        # variables listed here will be available to 
+        # all templates
+        'project_name': 'example',
+    },
+    'nginx.conf': {
+        # variables listed here will be available only to
+        # nginx.conf template
+        'domain': 'example.com',
+    },
+    'uwsgi.ini': {
+        # variables listed here will be available only to
+        # uwsgi.ini template
+        'module': 'myproject.wisgi',
     }
+}
+```
 
 It should be mentioned that the context returned by `CONFIGEN_DEFAULT_CONTEXT` 
 will be overridden by context variables returned by config processors if the 
@@ -129,8 +135,10 @@ confusion, we call them config processors.
 
 This is what a config processor function looks like:
 
-    def config_processor(template_name, *args):
-        return {'var': 'hello'}
+```python
+def config_processor(template_name, *args):
+    return {'var': 'hello'}
+```
 
 The config processor will be passed a `template_name` argument which will let it 
 it know the name of the template being compiled. This is useful if you want to 
@@ -138,10 +146,12 @@ return different data depending on the template.
 
 To use your config processor, add this to your settings:
 
-    CONFIGEN_CONFIG_PROCESSORS = [
-        'configen.config_processors.common',
-        'path.to.config_processor',
-    ]
+```python
+CONFIGEN_CONFIG_PROCESSORS = [
+    'configen.config_processors.common',
+    'path.to.config_processor',
+]
+```
 
 The order in which you list the config processors matters. The last config 
 processor will override the context variables from the previous processors in 
@@ -181,11 +191,13 @@ Configen provides two ways to change the name of the output file.
 
 First, the simple way: Using `CONFIGEN_DEFAULT_META` setting:
 
-    CONFIGEN_DEFAULT_META = {
-        '*': {
-            'outfile': 'project1_{template_name}'
-        }
+```python
+CONFIGEN_DEFAULT_META = {
+    '*': {
+        'outfile': 'project1_{template_name}'
     }
+}
+```
 
 `{template_name}` will be automatically replaced by the name of the template 
 including the file extension. 
@@ -197,13 +209,14 @@ template's output file name.
 Another way to provide the meta data to configen is by returning a second dict from your 
 config processor like this:
 
-    def config_processor(template_name, *args):
-        context = {'var': 'hello'}
+```python
+def config_processor(template_name, *args):
+    context = {'var': 'hello'}
 
-        meta = {'outfile': 'project1_%s' % template_name}
+    meta = {'outfile': 'project1_%s' % template_name}
 
-        return (context, meta)
-
+    return (context, meta)
+```
 
 Currently, there's only one option supported for meta data - `outfile`. 
 
@@ -225,11 +238,13 @@ of each config template.
 
 Example:
 
-    CONFIGEN_CONFIG_PROCESSORS = [
-        'configen.config_processors.common',
+```python
+CONFIGEN_CONFIG_PROCESSORS = [
+    'configen.config_processors.common',
 
-        'your.custom.processor',
-    ]
+    'your.custom.processor',
+]
+```
 
 The `configen.config_processors.common` config processor provided by configen 
 makes some commonly used variables available to you in your config templates:
@@ -248,20 +263,21 @@ A dictionary containing default context variables for generating config files.
 
 Example:
 
-    CONFIGEN_DEFAULT_CONTEXT = {
-        '*': {
-            # will be passed to all templates 
-            'project_name': 'Example',
-        },
-        'nginx.conf': 
-            # will be passed only to nginx.conf template
-            'domain': 'example.com',
-        },
-        'uwsgi.ini': {
-            'socket': '/tmp/example.sock',
-        },
-    }
-
+```python
+CONFIGEN_DEFAULT_CONTEXT = {
+    '*': {
+        # will be passed to all templates 
+        'project_name': 'Example',
+    },
+    'nginx.conf': {
+        # will be passed only to nginx.conf template
+        'domain': 'example.com',
+    },
+    'uwsgi.ini': {
+        'socket': '/tmp/example.sock',
+    },
+}
+```
 
 ### `CONFIGEN_DEFAULT_META`
 
@@ -272,17 +288,18 @@ Currently only option supported is `outfile`.
 
 Example:
 
-    CONFIGEN_DEFAULT_META = {
-        '*': {
-            # will be used for all templates 
-            'outfile': 'myproject_{template_name}',
-        },
-        'nginx.conf': 
-            # will be used only for nginx.conf template
-            'outfile': 'myproject_nginx_blah_blah.conf',
-        },
-    }
-
+```python
+CONFIGEN_DEFAULT_META = {
+    '*': {
+        # will be used for all templates 
+        'outfile': 'myproject_{template_name}',
+    },
+    'nginx.conf': {
+        # will be used only for nginx.conf template
+        'outfile': 'myproject_nginx_blah_blah.conf',
+    },
+}
+```
 
 ## Command line options
 
@@ -318,10 +335,11 @@ Example:
 
 And then access these arguments like this:
 
-    def config_processor(template_name, *args):
-        print(args)
-        # output: ('arg1', 'arg2',)
-
+```python
+def config_processor(template_name, *args):
+    print(args)
+    # output: ('arg1', 'arg2',)
+```
 
 **Important:** Doing `--extra arg1=hello arg2=world` will not work like you 
 would expect. `arg1=hello` will be parsed as a whole, instead of argument name 
@@ -329,9 +347,11 @@ and value.
 
 The value your config processor will recieve is this:
 
-    def config_processor(template_name, *args):
-        print(args)
-        # output: ('arg1=hello', 'arg2=world',)
+```python
+def config_processor(template_name, *args):
+    print(args)
+    # output: ('arg1=hello', 'arg2=world',)
+```
 
 Hence, we used the word "arguments" and not "keyword-arguments". You can't pass 
 arbitrary named keyword arguments via command line, at least not with `argparse` 
